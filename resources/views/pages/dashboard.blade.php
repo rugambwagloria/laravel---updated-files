@@ -120,10 +120,16 @@
                 </div>
             </div>
         </div>
-          <div class="col-12" style="text-align: center; margin-top: 20vh;">
+
+
+
+{{--        graph--}}
+
+   <div class="col-12" style="text-align: center; margin-top: 20vh;">
     <a href="{{ route('schools-performance') }}" class="btn btn-primary" style="display: inline-block;">CLICK HERE TO VIEW  SCHOOL PERFORMANCES</a>
 </div>
         
+
         <div class="row mt-4">
             <div class="col-lg-7 mb-lg-0 mb-4">
                 <div class="card z-index-2 h-100">
@@ -209,6 +215,7 @@
                                         <h6 class="text-sm mb-0">Attempts</h6>
                                     </td>
                                 </tr>
+
                             @if(isset($challenges))
                                 @foreach($challenges as $challenge)
                                     <tr>
@@ -251,104 +258,34 @@
                     </div>
                 </div>
             </div>
-            <div class=" mt-4 col-lg-7 mb-lg-0 mb-4">
-                <div class="card ">
-                    <div class="card-header pb-0 p-3">
-                        <div class="d-flex justify-content-between">
-                            <h6 class="mb-2">School Rankings per Challenge </h6>
-                        </div>
-                        <div class="d-flex justify-content-between">
-{{--                            a dropdown to select a challenge name--}}
-                            <div class="dropdown">
-                                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    Select Challenge
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    @if(isset($challenges))
-                                        @foreach($challenges as $challenge)
-                                            <li><a class="dropdown-item"  href="#">{{ $challenge->challenge_name }}</a></li>
-                                        @endforeach
-                                    @else
-                                        <li><a class="dropdown-item" href="#">No data available</a></li>
-                                    @endif
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table align-items-center ">
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <h6 class="text-sm mb-0">School</h6>
-                                </td>
-                                <td>
-                                    <h6 class="text-sm mb-0">Average score</h6>
-                                </td>
-                                <td>
-                                    <h6 class="text-sm mb-0">Percentage</h6>
-                            </tr>
-                            @if(isset($rankings))
-                                @foreach($rankings as $ranking)
-
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex px-2 py-1">
-                                                    <div>
-                                                        <img src="{{ asset('images/cha.jpeg') }}" class="avatar avatar-sm rounded-circle me-2">
-                                                    </div>
-                                                    <div class="d-flex flex-column justify-content-center">
-                                                        <h6 class="mb-0 text-sm">{{ $ranking->challenge_name }}</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="text-xs font-weight-bold">{{ $ranking->average }}</span>
-                                            </td>
-                                            <td>
-                                                <span class="text-xs font-weight-bold">{{ $ranking->percentage }}</span>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-
-                            @else
-                                <tr>
-                                    <td>
-                                        <div class="d-flex px-2 py-1">
-                                            <div>
-                                                <img src="{{ asset('images/challenge.png') }}" class="avatar avatar-sm rounded-circle me-2">
-                                            </div>
-                                            <div class="d-flex flex-column justify-content-center">
-                                                <h6 class="mb-0 text-sm">No data available</h6>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="text-xs font-weight-bold">No data available</span>
-                                    </td>
-                                    <td>
-                                        <span class="text-xs font-weight-bold">No data available</span>
-                                    </td>
-                                </tr>
-                            @endif
 
 
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-{{--            script to get the challenge name clicked in the dropdown and display the rankings from the rankingsarray for respective challenge--}}
-            <script>
-
-
-
-
-
-            </script>
 
             <div class="col-lg-5">
+                <div class="card mb-4">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-2">Select Challenge to view school performance </h6>
+                        </div>
+
+                            <form method="POST" action="{{route('schools-performance.show')}}">
+                                @csrf
+                                <label for="challenge_name">Select Challenge</label>
+                                {{--                            //use a select input type--}}
+                                <select id="challenge_name" name="challenge_name" class="form-select" aria-label="Default select example">
+                                    @if(isset($challenges))
+                                        @foreach($challenges as $challenge)
+                                            <option value="{{ $challenge->challenge_name }}">{{ $challenge->challenge_name }}</option>
+                                        @endforeach
+                                    @else
+                                        <option value="">No data available</option>
+                                    @endif
+
+                                </select>
+                                <button type="submit" class="btn mt-4 btn-primary">View</button>
+                            </form>
+                    </div>
+                </div>
                 <div class="card">
                     <div class="card-header pb-0 p-3">
                         <h6 class="mb-0">About Us</h6>
@@ -379,7 +316,7 @@
                                     </div>
                                     <div class="d-flex flex-column">
                                         <h6 class="mb-1 text-dark text-sm">Location<n/h6>
-                                        <span class="text-xs">Twed Towers, <span class="font-weight-bold">Kampala
+                                            <span class="text-xs">Twed Towers, <span class="font-weight-bold">Kampala
                                                 </span></span>
                                     </div>
 
@@ -426,6 +363,7 @@
                         </ul>
                     </div>
                 </div>
+
             </div>
         </div>
         <footer style="background-color: #f0f0f0; padding: 10px; text-align: center;">

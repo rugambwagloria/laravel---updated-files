@@ -58,7 +58,7 @@ class Analytics extends Model
         return DB::table('challenge')
             ->select('challenge_name', DB::raw('COUNT(participant_challenge_id) as total_attempts'))
             ->leftJoin('participant_challenge', 'challenge.challenge_id', '=', 'participant_challenge.challenge_id')
-            ->groupBy('challenge.challenge_id')
+            ->groupBy('challenge.challenge_id','challenge_name')
             ->get();
     }
 
@@ -91,14 +91,219 @@ class Analytics extends Model
 
                 $results[] = [
                     'school_name' => $school->school_name,
-                    'challenge_name' => $challenge->challenge_name,
                     'average_percentage_score' => $percentageScore,
-                    'average_score' => $averageScore
+                    'average_score' => $averageScore,
+                    'district'=> $school->school_district,
+                    //get school district
+
+
+                ];
+                //log the results
+                \Log::info('School: ' . $school->school_name . ' Challenge: ' . $challenge->challenge_name . ' Average Score: ' . $averageScore . ' Percentage Score: ' . $percentageScore . $school->school_district);
+
+            }
+        }
+//log the results
+        \Log::info('Results: ' . json_encode($results));
+        return $results;
+    }
+
+//get the top 5 schools given a challenge name
+    public function getTop5SchoolsPerChallenge($challengeName) {
+        $schools = DB::table('school_representative')->get();
+        $questionsToAttempt=DB::table('challenge')->select('questions_to_answer')->where('challenge_name',$challengeName)->first();
+
+        $results = [];
+
+        foreach ($schools as $school) {
+            $totalMarks = DB::table('participant_challenge')
+                ->join('participant', 'participant_challenge.participant_id', '=', 'participant.participant_id')
+                ->join('challenge', 'participant_challenge.challenge_id', '=', 'challenge.challenge_id')
+                ->where('participant.schoolRegNo', $school->school_regNo)
+                ->where('challenge.challenge_name', $challengeName)
+                ->sum('score');
+
+            $totalAttempts = DB::table('participant_challenge')
+                ->join('participant', 'participant_challenge.participant_id', '=', 'participant.participant_id')
+                ->join('challenge', 'participant_challenge.challenge_id', '=', 'challenge.challenge_id')
+                ->where('participant.schoolRegNo', $school->school_regNo)
+                ->where('challenge.challenge_name', $challengeName)
+                ->count();
+
+            $averageScore = $totalAttempts > 0 ? $totalMarks / $totalAttempts : 0;
+            $percentageScore = ($averageScore / ($questionsToAttempt->questions_to_answer)) * 100; // Assuming total possible score is 10
+            //cast as int
+            $percentageScore = (int)$percentageScore;
+            $averageScore = (int)$averageScore;
+
+            $results[] = [
+                'school_name' => $school->school_name,
+                'average_percentage_score' => $percentageScore,
+                'average_score' => $averageScore,
+                'district' => $school->school_district,
+            ];
+        }
+
+        // Sort the results by average percentage score in descending order
+        usort($results, function($a, $b) {
+            return $b['average_percentage_score'] - $a['average_percentage_score'];
+        });
+
+        // Return only the top 5 schools
+        return array_slice($results, 0, 5);
+    }
+
+    //get bottom 5 schools given a challenge name
+    public function getBottom5SchoolsPerChallenge($challengeName) {
+        $schools = DB::table('school_representative')->get();
+        $results = [];
+//        $questionsToAttempt=DB::table('challenge')->get()->where('challenge_name',$challengeName);
+        $questionsToAttempt=DB::table('challenge')->select('questions_to_answer')->where('challenge_name',$challengeName)->first();
+        foreach ($schools as $school) {
+            $totalMarks = DB::table('participant_challenge')
+                ->join('participant', 'participant_challenge.participant_id', '=', 'participant.participant_id')
+                ->join('challenge', 'participant_challenge.challenge_id', '=', 'challenge.challenge_id')
+                ->where('participant.schoolRegNo', $school->school_regNo)
+                ->where('challenge.challenge_name', $challengeName)
+                ->sum('score');
+
+            $totalAttempts = DB::table('participant_challenge')
+                ->join('participant', 'participant_challenge.participant_id', '=', 'participant.participant_id')
+                ->join('challenge', 'participant_challenge.challenge_id', '=', 'challenge.challenge_id')
+                ->where('participant.schoolRegNo', $school->school_regNo)
+                ->where('challenge.challenge_name', $challengeName)
+                ->count();
+
+            $averageScore = $totalAttempts > 0 ? $totalMarks / $totalAttempts : 0;
+            $percentageScore = ($averageScore / ($questionsToAttempt->questions_to_answer)) * 100; // Assuming total possible score is 10
+            //cast as int
+            $percentageScore = (int)$percentageScore;
+            $averageScore = (int)$averageScore;
+
+            $results[] = [
+                'school_name' => $school->school_name,
+                'average_percentage_score' => $percentageScore,
+                'average_score' => $averageScore,
+                'district' => $school->school_district,
+            ];
+        }
+
+        // Sort the results by average percentage score in ascending order
+        usort($results, function($a, $b) {
+            return $a['average_percentage_score'] - $b['average_percentage_score'];
+        });
+
+        // Return only the bottom 5 schools
+        return array_slice($results, 0, 5);
+    }
+    //return array of challenge names
+    public function getChallenges(){
+        return DB::table('challenge')->select('challenge_name')->get();
+    }
+
+    public function getTop5Schools()
+    {
+        $schools = DB::table('school_representative')->get();
+        $challenges = DB::table('challenge')->get();
+        $schoolScores = [];
+
+        foreach ($schools as $school) {
+            $totalPercentageScore = 0;
+            $challengesCount = 0;
+
+            foreach ($challenges as $challenge) {
+                $totalMarks = DB::table('participant_challenge')
+                    ->join('participant', 'participant_challenge.participant_id', '=', 'participant.participant_id')
+                    ->join('challenge', 'participant_challenge.challenge_id', '=', 'challenge.challenge_id')
+                    ->where('participant.schoolRegNo', $school->school_regNo)
+                    ->where('challenge.challenge_id', $challenge->challenge_id)
+                    ->sum('score');
+
+                $totalAttempts = DB::table('participant_challenge')
+                    ->join('participant', 'participant_challenge.participant_id', '=', 'participant.participant_id')
+                    ->join('challenge', 'participant_challenge.challenge_id', '=', 'challenge.challenge_id')
+                    ->where('participant.schoolRegNo', $school->school_regNo)
+                    ->where('challenge.challenge_id', $challenge->challenge_id)
+                    ->count();
+
+                if ($totalAttempts > 0) {
+                    $averageScore = $totalMarks / $totalAttempts;
+                    $percentageScore = ($averageScore / $challenge->questions_to_answer) * 100;
+                    $totalPercentageScore += $percentageScore;
+                    $challengesCount++;
+                }
+            }
+
+            if ($challengesCount > 0) {
+                $averagePercentageScore = $totalPercentageScore / $challengesCount;
+                $schoolScores[] = [
+                    'school_name' => $school->school_name,
+                    'average_percentage_score' => $averagePercentageScore,
+                    'district'=>$school->school_district,
                 ];
             }
         }
 
-        return $results;
+        // Sort schools by average percentage score in descending order
+        usort($schoolScores, function ($a, $b) {
+            return $b['average_percentage_score'] <=> $a['average_percentage_score'];
+        });
+
+        // Get top 5 schools
+        return array_slice($schoolScores, 0, 5);
+    }
+
+
+    public function getBottom5Schools()
+    {
+        $schools = DB::table('school_representative')->get();
+        $challenges = DB::table('challenge')->get();
+        $schoolScores = [];
+
+        foreach ($schools as $school) {
+            $totalPercentageScore = 0;
+            $challengesCount = 0;
+
+            foreach ($challenges as $challenge) {
+                $totalMarks = DB::table('participant_challenge')
+                    ->join('participant', 'participant_challenge.participant_id', '=', 'participant.participant_id')
+                    ->join('challenge', 'participant_challenge.challenge_id', '=', 'challenge.challenge_id')
+                    ->where('participant.schoolRegNo', $school->school_regNo)
+                    ->where('challenge.challenge_id', $challenge->challenge_id)
+                    ->sum('score');
+
+                $totalAttempts = DB::table('participant_challenge')
+                    ->join('participant', 'participant_challenge.participant_id', '=', 'participant.participant_id')
+                    ->join('challenge', 'participant_challenge.challenge_id', '=', 'challenge.challenge_id')
+                    ->where('participant.schoolRegNo', $school->school_regNo)
+                    ->where('challenge.challenge_id', $challenge->challenge_id)
+                    ->count();
+
+                if ($totalAttempts > 0) {
+                    $averageScore = $totalMarks / $totalAttempts;
+                    $percentageScore = ($averageScore / $challenge->questions_to_answer) * 100;
+                    $totalPercentageScore += $percentageScore;
+                    $challengesCount++;
+                }
+            }
+
+            if ($challengesCount > 0) {
+                $averagePercentageScore = $totalPercentageScore / $challengesCount;
+                $schoolScores[] = [
+                    'school_name' => $school->school_name,
+                    'average_percentage_score' => $averagePercentageScore,
+                    'district'=>$school->school_district,
+                ];
+            }
+        }
+
+        // Sort schools by average percentage score in ascending order
+        usort($schoolScores, function ($a, $b) {
+            return $a['average_percentage_score'] <=> $b['average_percentage_score'];
+        });
+
+        // Get bottom 5 schools
+        return array_slice($schoolScores, 0, 5);
     }
 
 

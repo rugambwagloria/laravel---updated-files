@@ -63,40 +63,66 @@
                 <div class="form-group">
                     <label for="name">Challenge Name:</label>
                     <input type="text" id="name" name="challenge_name" class="form-control" required>
+{{--                     validation error message--}}
+                    @error('challenge_name')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
                 </div>
                 <div class="form-group">
                     <label for="number">Challenge Description:</label>
                     <textarea id="description" name="challenge_description" class="form-control" required></textarea>
+                    @error('challenge_description')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
+
                 </div>
 
                 <div class="form-group row">
                     <div class="col-md-6">
                         <label for="start_date">Start Date:</label>
                         <input type="date" id="start_date" name="challenge_start_date" class="form-control" required>
+                        @error('challenge_start_date')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-6">
                         <label for="finish_date">Finish Date:</label>
                         <input type="date" id="finish_date" name="challenge_end_date" class="form-control" required>
+                        @error('challenge_end_date')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-6">
                         <label for="wrong_answer_marks">Wrong Answer Marks:</label>
                         <p>Should either be negative or zero</p>
                         <input type="number" id="wrong_answer_marks" name="wrong_answer_marks" class="form-control" required>
+                        @error('wrong_answer_marks')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-6">
                         <label for="blank_answer_marks">Blank Answer Marks:</label>
                         <p>Should either be negative or zero</p>
                         <input type="number" id="blank_answer_marks" name="blank_answer_marks" class="form-control" required>
+                        @error('blank_answer_marks')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
                 <div class="form-group row">
                     <div class="col-md-6">
                         <label for="questions_to_answer">Questions to Answer:</label>
                         <input type="number" id="questions_to_answer" name="questions_to_answer" class="form-control" required>
+                        @error('questions_to_answer')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="col-md-6">
                         <label for="duration">Duration of attempt(minutes):</label>
                         <input type="number" id="duration" name="duration" class="form-control" required>
+                        @error('duration')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
 
@@ -105,15 +131,21 @@
                     <div class="mb-3">
                         <label for="questionDocument" class="form-label">Question Document (Excel)</label>
                         <input type="file" class="form-control" id="questionDocument" name="question_document" required accept=".xlsx, .xls">
+                        @error('question_document')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-3">
                         <label for="answerDocument" class="form-label">Answer Document (Excel)</label>
                         <input type="file" class="form-control" id="answerDocument" name="answer_document" required accept=".xlsx, .xls">
+                        @error('answer_document')
+                        <div class="alert alert-danger">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Create Challenge</button>
 
-                <a href="{{ route('challenges.index') }}" class="btn btn-primary">Back to Challenges</a>
+                <a href="{{ route('challenges.index') }}" class="btn btn-primary-100">Back to Challenges</a>
 
             </form>
 

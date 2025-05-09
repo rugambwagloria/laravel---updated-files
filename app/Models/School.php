@@ -19,7 +19,7 @@ class School extends Authenticatable
 $school_representative = School::orderBy('school_name')->paginate(40);
 
 // Pass the paginated data to the view
-return view('pages.schools-data', ['school_representative' => $school_representative]);
+return view('pages.school-management', ['school_representative' => $school_representative]);
 }
 //    protected $primaryKey = 'school_regNo';
 //public $incrementing = false;

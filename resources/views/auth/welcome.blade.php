@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Page-Enter" content="revealTrans(Duration=2.0,Transition=?)">
+
     <title>Welcome Page</title>
     <style>
         body {

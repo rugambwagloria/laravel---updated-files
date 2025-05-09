@@ -18,7 +18,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-6 offset-md-3" style="margin-top: 100px; margin-bottom: 50px;">
-                        <div class="card card-plain" style="border: 1px solid #ccc; border-radius: 10px; padding: 20px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+                        <div class="card card-plain" >
                             <div class="card-header pb-0 text-start">
                                 <h4 class="font-weight-bolder" style="color: black;">Sign In</h4>
                                 <p class="mb-0" style="color: black;">Enter your email and password to sign in</p>
